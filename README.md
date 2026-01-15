@@ -135,5 +135,6 @@
 
 ### 2.4 Построение концептуальной модели в нотации Питера Чена
 На основе выделенных сущностей и связей предметной области была построена концептуальная модель. Для представления концептуальной модели использована нотация Питера Чена.
-<img width="1590" height="858" alt="image" src="https://github.com/user-attachments/assets/6ab491ae-7790-4937-bfd7-a76203f1ef2c" />
+<img width="1052" height="864" alt="image" src="https://github.com/user-attachments/assets/c64dfac9-43ac-45c8-b9ae-a479fb1ec321" />
+
 
