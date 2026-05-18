@@ -103,19 +103,6 @@
 | city          | VARCHAR(50)  | NOT NULL       | —           |
 | aircraft_type | VARCHAR(50)  | NOT NULL       | —           |
 
-**Сущность Passenger**
-|    Атрибут    |  Тип данных  | Обязательность | Ограничение |
-|:-------------:|:------------:|:--------------:|:-----------:|
-| passenger_id  | BIGINT       | NOT NULL       | PRIMARY KEY |
-| last_name     | VARCHAR(50)  | NOT NULL       | —           |
-| first_name    | VARCHAR(50)  | NOT NULL       | —           |
-| middle_name   | VARCHAR(50)  | NULL           | —           |
-| date_of_birth | DATE         | NOT NULL       | —           |
-| document_type | VARCHAR(50)  | NOT NULL       | —           |
-| citizenship   | VARCHAR(50)  | NOT NULL       | —           |
-| email         | VARCHAR(100) | NULL           | —           |
-| phone         | VARCHAR(20)  | NULL           | —           |
-
 **Сущность Flight**
 |        Атрибут       |  Тип данных | Обязательность |                                         Ограничение                                        |
 |:--------------------:|:-----------:|:--------------:|:------------------------------------------------------------------------------------------:|
@@ -152,6 +139,19 @@
 | flight_id     | BIGINT        | NOT NULL       | FOREIGN KEY                                                                   |
 | seat_id       | BIGINT        | NULL           | FOREIGN KEY, UNIQUE                                                           |
 
+**Сущность Passenger**
+|    Атрибут    |  Тип данных  | Обязательность | Ограничение |
+|:-------------:|:------------:|:--------------:|:-----------:|
+| passenger_id  | BIGINT       | NOT NULL       | PRIMARY KEY |
+| last_name     | VARCHAR(50)  | NOT NULL       | —           |
+| first_name    | VARCHAR(50)  | NOT NULL       | —           |
+| middle_name   | VARCHAR(50)  | NULL           | —           |
+| date_of_birth | DATE         | NOT NULL       | —           |
+| document_type | VARCHAR(50)  | NOT NULL       | —           |
+| citizenship   | VARCHAR(50)  | NOT NULL       | —           |
+| email         | VARCHAR(100) | NULL           | —           |
+| phone         | VARCHAR(20)  | NULL           | —           |
+
 **Сущность CheckIn**
 |     Атрибут     |  Тип данных | Обязательность |                                   Ограничение                                   |
 |:---------------:|:-----------:|:--------------:|:-------------------------------------------------------------------------------:|
@@ -180,6 +180,12 @@
 | baggage_status     | VARCHAR(30)  | NOT NULL       | —                  |
 | check_in_id        | BIGINT       | NOT NULL       | FOREIGN KEY        |
 
+**Сущность TicketService**
+|   Атрибут  | Тип данных | Обязательность |        Ограничение       |
+|:----------:|:----------:|:--------------:|:------------------------:|
+| ticket_id  | BIGINT     | NOT NULL       | PRIMARY KEY, FOREIGN KEY |
+| service_id | BIGINT     | NOT NULL       | PRIMARY KEY, FOREIGN KEY |
+
 **Сущность Service**
 |      Атрибут     |   Тип данных  | Обязательность |     Ограничение    |
 |:----------------:|:-------------:|:--------------:|:------------------:|
@@ -188,12 +194,6 @@
 | service_type     | VARCHAR(50)   | NOT NULL       | —                  |
 | price            | DECIMAL(10,2) | NOT NULL       | CHECK (price >= 0) |
 | included_in_fare | BOOLEAN       | NOT NULL       | —                  |
-
-**Сущность TicketService**
-|   Атрибут  | Тип данных | Обязательность |        Ограничение       |
-|:----------:|:----------:|:--------------:|:------------------------:|
-| ticket_id  | BIGINT     | NOT NULL       | PRIMARY KEY, FOREIGN KEY |
-| service_id | BIGINT     | NOT NULL       | PRIMARY KEY, FOREIGN KEY |
 
 ### Как спроектированная модель соответствует всем бизнес-правилам
 | Бизнес-правило  |  Подход к реализации |  Описание  |
