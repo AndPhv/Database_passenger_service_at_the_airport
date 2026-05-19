@@ -55,12 +55,13 @@
 
 ### Построение концептуальной модели в нотации Питера Чена
 На основе выделенных сущностей и связей предметной области была построена концептуальная модель. Для представления концептуальной модели использована нотация Питера Чена.
-<img width="1052" height="864" alt="image" src="https://github.com/user-attachments/assets/c64dfac9-43ac-45c8-b9ae-a479fb1ec321" />
+<img width="1376" height="1541" alt="Аэропорт -Концептуал drawio" src="https://github.com/user-attachments/assets/c6ff2d37-0b76-442c-9870-9346384e55e4" />
 
 ## Построение ER модели
 После построения концептуальной модели предметной области, отражающей ключевые сущности и связи между ними на абстрактном уровне, выполняется этап логического проектирования базы данных.
 
 ### ERD в нотации Crow’s Foot
+<img width="1727" height="1239" alt="Аэропорт -ERD drawio" src="https://github.com/user-attachments/assets/d640703e-124c-49d1-bf13-8b4569f68955" />
 
 > На концептуальном уровне сущности «Аэропорт отправления» и «Аэропорт назначения» разделены для отражения различных бизнес-ролей. На логическом уровне они были сведены к единой сущности Airport с использованием ролевых внешних ключей.
 ### Табличное описание модели
@@ -90,7 +91,7 @@
 | registration_number | VARCHAR(20) | NOT NULL       | UNIQUE                    |
 | serial_number       | VARCHAR(30) | NULL           | UNIQUE                    |
 | seat_capacity       | INTEGER     | NOT NULL       | CHECK (seat_capacity > 0) |
-| tail_number         | VARCHAR(20) | NULL           | UNIQUE                    |
+| board_number        | VARCHAR(20) | NOT NULL       | UNIQUE                    |
 | aircraft_type       | VARCHAR(50) | NOT NULL       | —                         |
 
 **Сущность Airport**
@@ -104,18 +105,18 @@
 | aircraft_type | VARCHAR(50)  | NOT NULL       | —           |
 
 **Сущность Flight**
-|        Атрибут       |  Тип данных | Обязательность |                                         Ограничение                                        |
-|:--------------------:|:-----------:|:--------------:|:------------------------------------------------------------------------------------------:|
-| flight_id            | BIGINT      | NOT NULL       | PRIMARY KEY                                                                                |
-| flight_number        | VARCHAR(10) | NOT NULL       | —                                                                                          |
-| status               | VARCHAR(30) | NOT NULL       | CHECK (status IN ('SCHEDULED', 'BOARDING', 'DELAYED', 'DEPARTED', 'ARRIVED', 'CANCELLED')) |
-| scheduled_departure  | TIMESTAMP   | NOT NULL       | —                                                                                          |
-| scheduled_arrival    | TIMESTAMP   | NOT NULL       | —                                                                                          |
-| actual_departure     | TIMESTAMP   | NULL           | —                                                                                          |
-| actual_arrival       | TIMESTAMP   | NULL           | —                                                                                          |
-| departure_airport_id | BIGINT      | NOT NULL       | FOREIGN KEY                                                                                |
-| arrival_airport_id   | BIGINT      | NOT NULL       | FOREIGN KEY                                                                                |
-| aircraft_id          | BIGINT      | NOT NULL       | FOREIGN KEY                                                                                |
+|        Атрибут       |  Тип данных | Обязательность |                                         Ограничение                                             |
+|:--------------------:|:-----------:|:--------------:|:-----------------------------------------------------------------------------------------------:|
+| flight_id            | BIGINT      | NOT NULL       | PRIMARY KEY                                                                                     |
+| flight_number        | VARCHAR(10) | NOT NULL       | —                                                                                               |
+| status               | VARCHAR(30) | NOT NULL       | CHECK (status IN ('SCHEDULED', 'BOARDING', 'DELAYED', 'DEPARTED', 'ARRIVED', 'CANCELLED'))      |
+| scheduled_departure  | TIMESTAMP   | NOT NULL       | —                                                                                               |
+| scheduled_arrival    | TIMESTAMP   | NOT NULL       | CHECK (scheduled_arrival > scheduled_departure)                                                 |
+| actual_departure     | TIMESTAMP   | NULL           | —                                                                                               |
+| actual_arrival       | TIMESTAMP   | NULL           | CHECK (actual_arrival IS NULL OR actual_departure IS NULL OR actual_arrival > actual_departure) |
+| departure_airport_id | BIGINT      | NOT NULL       | FOREIGN KEY                                                                                     |
+| arrival_airport_id   | BIGINT      | NOT NULL       | FOREIGN KEY                                                                                     |
+| aircraft_id          | BIGINT      | NOT NULL       | FOREIGN KEY                                                                                     |
 
 **Сущность Seat**
 |   Атрибут   |  Тип данных | Обязательность |                                Ограничение                                |
@@ -125,6 +126,7 @@
 | row_number  | INTEGER     | NOT NULL       | —                                                                         |
 | seat_letter | CHAR(1)     | NOT NULL       | —                                                                         |
 | seat_class  | VARCHAR(20) | NOT NULL       | CHECK (seat_class IN ('ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST')) |
+> Для сущности Seat введено составное ограничение UNIQUE (flight_id, row_number, seat_letter), обеспечивающее невозможность существования двух одинаковых мест в рамках одного рейса
 
 **Сущность Ticket**
 |    Атрибут    |   Тип данных  | Обязательность |                                  Ограничение                                  |
@@ -162,13 +164,14 @@
 | ticket_id       | BIGINT      | NOT NULL       | FOREIGN KEY, UNIQUE                                                             |
 
 **Сущность BoardingPass**
-|      Атрибут     |  Тип данных | Обязательность |     Ограничение     |
-|:----------------:|:-----------:|:--------------:|:-------------------:|
-| boarding_pass_id | BIGINT      | NOT NULL       | PRIMARY KEY         |
-| gate             | VARCHAR(10) | NOT NULL       | —                   |
-| boarding_group   | VARCHAR(10) | NOT NULL       | —                   |
-| boarding_time    | TIMESTAMP   | NOT NULL       | —                   |
-| check_in_id      | BIGINT      | NOT NULL       | FOREIGN KEY, UNIQUE |
+|      Атрибут        |  Тип данных | Обязательность |     Ограничение     |
+|:-------------------:|:-----------:|:--------------:|:-------------------:|
+| boarding_pass_id    | BIGINT      | NOT NULL       | PRIMARY KEY         |
+| check_in_id         | BIGINT      | NOT NULL       | FOREIGN KEY, UNIQUE |
+| boarding_pass_number| VARCHAR(30) | NOT NULL       | UNIQUE              |
+| gate                | VARCHAR(10) | NOT NULL       | —                   |
+| boarding_group      | VARCHAR(10) | NOT NULL       | —                   |
+| boarding_time       | TIMESTAMP   | NOT NULL       | —                   |
 
 **Сущность Baggage**
 |       Атрибут      |  Тип данных  | Обязательность |     Ограничение    |
@@ -180,11 +183,12 @@
 | baggage_status     | VARCHAR(30)  | NOT NULL       | —                  |
 | check_in_id        | BIGINT       | NOT NULL       | FOREIGN KEY        |
 
-**Сущность TicketService**
+**Ассоциативная сущность TicketService**
 |   Атрибут  | Тип данных | Обязательность |        Ограничение       |
 |:----------:|:----------:|:--------------:|:------------------------:|
 | ticket_id  | BIGINT     | NOT NULL       | PRIMARY KEY, FOREIGN KEY |
 | service_id | BIGINT     | NOT NULL       | PRIMARY KEY, FOREIGN KEY |
+> Сущность TicketService является ассоциативной и используется для реализации связи многие-ко-многим между Ticket и Service. Составной первичный ключ из атрибутов ticket_id и service_id обеспечивает уникальность подключения услуги к билету.
 
 **Сущность Service**
 |      Атрибут     |   Тип данных  | Обязательность |     Ограничение    |
@@ -193,21 +197,27 @@
 | service_name     | VARCHAR(100)  | NOT NULL       | —                  |
 | service_type     | VARCHAR(50)   | NOT NULL       | —                  |
 | price            | DECIMAL(10,2) | NOT NULL       | CHECK (price >= 0) |
-| included_in_fare | BOOLEAN       | NOT NULL       | —                  |
+| included_in_fare | BOOLEAN       | NOT NULL       | DEFAULT FALSE      |
 
 ### Как спроектированная модель соответствует всем бизнес-правилам
-| Бизнес-правило  |  Подход к реализации |  Описание  |
-| ------------ | ------------ | ------------ |
-| Пассажир может иметь несколько билетов на разные рейсы  |   | Построение связи один-ко-многим  |
-| Успешная регистрация приводит к формированию одного посадочного талона  | BoardingPass.check_in_id UNIQUE  | Построение связи один-к-одному  |
-| Билет может включать несколько дополнительных услуг  | Создание сущности Ticket_service для реализации составного ключа |  Построение связи многие-ко-многим  |
-| Один билет может быть зарегистрирован не более одного раза  | CheckIn.ticket_id — UNIQUE  | Использование ограничения UNIQUE  |
-| Место в салоне может быть назначено только одному пассажиру на рейсе  | UNIQUE (flight_id, row_number, seat_letter)  | Использование составного ограничения UNIQUE  |
-| Вес багажа не может быть отрицательным  | Baggage.weight CHECK (Baggage.weight > 0)  | Использование ограничения CHECK  |
-| Рейс имеет один аэропорт отправления и один аэропорт назначения  | Два FK в Flight  | Несколько ролей одной сущности  |
-| регистрация на рейс возможна только при наличии действительного билета  | BEFORE INSERT ON CheckIn  | Триггерная функция  |
-| успешная регистрация приводит к формированию одного посадочного талона  | IF check_in_status = 'SUCCESS' THEN BoardingPass MUST exist  | Триггерная функция  |
-| каждому пассажиру при регистрации назначается одно место в салоне воздушного судна  | IF inserting CheckIn AND Ticket.seat_id IS NULL THEN ERROR  | Триггерная функция  |
+| Бизнес-правило |  Подход к реализации | Описание |
+|:----------------------------------------------:|:---------------------------------------------------------:|:----------------------------------------------------------------------:|
+| Пассажир может иметь несколько билетов на разные рейсы                                              | Связь Passenger 1 : M Ticket через FK Ticket.passenger_id | Реализация хранения истории перелётов пассажира                        |
+| Каждый билет относится только к одному рейсу                                                        | FK Ticket.flight_id                                       | Обеспечение принадлежности билета конкретному рейсу                    |
+| Один билет может быть зарегистрирован не более одного раза                                          | UNIQUE (CheckIn.ticket_id)                                | Исключение повторной регистрации по одному билету                      |
+| Успешная регистрация формирует один посадочный талон                                                | UNIQUE (BoardingPass.check_in_id)                         | Обеспечение взаимно-однозначной связи регистрации и посадочного талона |
+| Место в салоне может быть назначено только одному билету                                            | UNIQUE (Ticket.seat_id)                                   | Предотвращение двойного назначения пассажирского места                 |
+| В рамках одного рейса не может существовать двух одинаковых мест                                    | UNIQUE (flight_id, row_number, seat_letter)               | Обеспечение уникальности мест внутри рейса                             |
+| Билет может включать несколько дополнительных услуг, а услуги могут использоваться в разных билетах | Ассоциативная сущность TicketService                      | Реализация связи многие-ко-многим                                      |
+| Один и тот же билет не может содержать одинаковую услугу более одного раза                          | PRIMARY KEY (ticket_id, service_id)                       | Исключение дублирования услуг в одном билете                           |
+| Рейс должен иметь аэропорт отправления и аэропорт назначения                                        | FK departure_airport_id и arrival_airport_id              | Реализация различных ролей сущности Airport                            |
+| Плановое и фактическое время прибытия должно быть позже времени отправления                         | CHECK-ограничения в Flight                                | Контроль корректной временной последовательности рейса                 |
+| Вес багажа, стоимость билета и стоимость услуги не могут быть отрицательными                        | CHECK (value > 0 / >= 0)                                  | Контроль допустимых значений числовых атрибутов                        |
+| Регистрация на рейс возможна только при наличии действительного билета                              | BEFORE INSERT trigger ON CheckIn                          | Контроль бизнес-логики регистрации                                     |
+| При регистрации пассажиру должно быть назначено место       | Проверка Ticket.seat_id в триггере регистрации            | Контроль обязательного распределения мест                              |
+| Посадочный талон не может существовать без регистрации      | FK BoardingPass.check_in_id                               | Обеспечение ссылочной целостности                                      |
+| Каждое место багажа должно относиться к конкретной регистрации | FK Baggage.check_in_id                             | Обеспечение связи багажа с процессом регистрации             |
+| Большинство услуг не включается в тариф по умолчанию                                                | DEFAULT FALSE для included_in_fare                        | Автоматизация начального состояния услуги                              |
 
 ## Физическое проектирование базы данных на PostgreSQL
 
